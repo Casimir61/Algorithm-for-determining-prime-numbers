@@ -1,0 +1,14 @@
+Zakres: 1000000
+==========================
+Algorytm użytkownika (6n ± 1):
+Ilość liczb pierwszych: 78498
+Czas wykonania: 0.024043 sekund
+
+Sito Eratostenesa:
+Ilość liczb pierwszych: 78498
+Czas wykonania: 0.292235 sekund
+
+Sito Atkina:
+Ilość liczb pierwszych: 78498
+Czas wykonania: 0.237155 sekund
+
