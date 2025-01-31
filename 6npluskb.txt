@@ -1,118 +1,88 @@
-﻿Algorytm wyznaczania liczb pierwszych oparty na indeksach
-Algorytm do generowania liczb pierwszych oparty jest na wzorcach matematycznych, które wykorzystują indeksy (a nie wartości liczbowe) do identyfikacji liczb pierwszych. Dzięki temu możliwe jest szybkie wygenerowanie liczb pierwszych przy użyciu ciągów arytmetycznych opartych na kombinacjach różnych typów liczb (nieparzyste i parzyste). Całość jest zoptymalizowana, aby uniknąć zbędnych obliczeń i podwójnych pętli.
-Założenia:
-1. Tworzymy wektor typu <bool> Jedna komórka oznacza liczbę postaci  6n±1. Czyli 5, 7,11 , 13,17, 19,23, 25...
-2. Wszystkie komórki początkowo oznaczone są na true – domniemanie, że mamy wyłącznie liczby pierwsze.
-3. Adres konkretnej liczby łatwo jest ustalić np. 17/3=5, 101/3=33 itp. Mowa oczywiście o dzieleniu typu int/int w C++
-4. Indeksy nieparzyste oznaczają liczby 3*1+2=5, 3*3+2=11,... 3(k+1)+2, parzyste 2*3+1=7,4*3+1=13...
-5. Celem algorytmu jest dokonywanie obliczeń na indeksach liczb dla szybkiego uzyskania indeksu liczby która nie jest pierwsza: np. 1x1 (czyli 5*5) = 3*0*0+10*0+8=8 (3*8+1=25). Zaczynamy pętlę for od 0. Dla 2x2 = 3*0*0+14*0+16=16(3*16+1=49=7*7)
-6. Takie podejście oszczędza pamięć – ile liczb tyle bitów, operacje na indeksach pozwalają na obliczenia na znacznie mniejszych liczbach.  
-7. W zakresie do 1010 algorytm okazał się prawie 3x szybszy od Algorytmu Atkina. SI potwierdza wyjatkowość i oryginalność algorytmu i nie odnajduje odpowiedników.
-Rozważmy cztery przypadki iloczynów indeksów liczb:
-1. nieparzysty*nieparzysty, n-n
-2. nieparzysty*parzysty, n-p
-3. parzysty*nieparzysty, p-n
-4. parzysty*parzysty, p-p
+Algorithm for determining prime numbers
 
-Ad. 1 n  n = (3i+2)*(3j+2) = 9ij + 6i + 6j + 4 = 3(3ij + 2i +2j + 4/3) po podzieleniu całkowitoliczbowym przez 3 uzyskujemy adres komórki pod którą znajduje się wynik: 3ij + 2i + 2j + 1 
-Przykłady 5 ma adres nieparzysty 5/3=1, 11 ma adres nieparzysty 11/3=3 czyli
-3*1*3+2*1+1=11, czyli 3*11+2 = 35 (5*7)
-Tworzymy szereg kwadratowy ciąg arytmetyczny:
-dla 5*5 mamy i=j czyli a1 = 3i2 + 4i + 1
-dla 5*7 mamy  j=i+2 a2 = 3i(i+2) + 2i + 2(i+2) + 1 = 3i2 + 10i + 5
-a2 – a1 = 6i + 4
-Uzyskaliśmy kwadratowy ciąg arytmetyczny an = a1 + (n – 1)r dla n = 1, 3, 5, 7 …, gdzie r = 6n + 4
-{an}n=1∞= {3n2 + 10n + 5 : n = 2k+1 ∈N}
-Jest to swoisty ciąg ciągów:
-dla n=1 mamy 8, 8+10=18, 18+10=28...
-dla n=2 mamy 37, 37+16=53, 53+16=69...
-Aby uniknąć podwójnych pętli (dla parzystych od 0, dla nieparzystych od 1) zwiększymy i o 1, aby móc zacząć pętlę for od 0:
-a1 = 3(i+1)2 + 4(i+1) + 1 = 3i2 + 10i + 8 // podstawiając i=0 uzyskujemy to samo co poprzednio dla i=1
-r = 6(i+1) + 4 = 6i + 10
+Let vector A=<1,1,1,1......>
+A[1] means 5, A[2] means 7 - these are sequence numbers  6n±1
+Recalculation: 5/3=1 index A[1], 7/3=2 index A[2]
+The other way: index 1 is 3*1+2=5, indexn 2 3*2+1=7
+If the index is odd, we add 2, if it is even, we add 1.
+To determine prime numbers in a vector, we must mark all products of prime numbers in it as 0. 
+For this purpose, let us determine all possible products:
+ewen – even
+e-e
+e*e = (3(i+2)+1)*(3(i+2)+1)=3*(3i^2+14i+49/3)  dividing by 3        a1= 3i^2+14i+16;
+e*(e+2) = a2 = 3(i+2)2+14(i+2)+16=3i^2+20i+30;
+r = a2-a1=6i+14
 
-Ad. 2  n  p = (3i + 2) * (3j + 1) = 9ij + 3i + 6j + 2 = 3(3ij + i + 2j + 2/3) po podzieleniu całkowitoliczbowym przez 3 uzyskujemy adres komórki pod którą znajduje się wynik: 3ij + i + 2j
-Przykłady jak to działa:
-1  2 = 1(1*3+2=5)  2(2*3+1=7) = 3*1*2+2*1+2*2=11(3*11+1=35)
-W tej sytuacji parzyste – nieparzyste pierwsza para to liczby o indeksach 1 i 2. Wniosek z tego, że i=1, j=i+1. Liczymy
-a1 = 3i(i+1) + i + 2(i+1) = 3i2 + 6i + 2, dla a2 i pozostaje bez zmian, j wzrasta o 2:
-a2 = 3i(i+3) + i + 2(i+3) = 3i2 + 12i + 6, stąd a2 – a1 = 6i + 4;
-Uzyskaliśmy kolejny kwadratowy ciąg arytmetyczny an = a1 + (n – 1)r dla n = 1, 3, 5, 7 …, gdzie r = 6n + 4
-{an}n=1∞= {3n2 + 6n + 2 : n = 2k+1 ∈N}
-Jest to swoisty ciąg ciągów:
-dla n=1: 11, 11+10=21, 21+10=31, 31+10=41...
-dla n=2: 26, 26+16=42, 42+16...
-Powtarzamy to co poprzedni, obliczamy wyraz a1 dla i zwiększonego o 1, aby w pętli for od 0 wszystko pasowało:
-a1 = 3(i+1)2 + 6(i+1) + 2 = 3i2 + 12i + 11 oraz r = 6(i+1) + 4 = 6i + 10
+counting similarly for odd*odd, even*odd, odd*even, even*even we receive:
 
-Ad. 3  p  n =  (3i + 1) * ( 3j + 2) =//w nieparzystych zaczynamy od elementu pierwszego (i=2, j=1) pod którym jest 5
-=9ij + 6i + 3j + 2 = 3(3ij +2i + j + 2/3) i po podzieleniu całkowitoliczbowym przez 3  uzyskujemy 3ij + 2i + j stąd dla i(2), j(1) uzyskujemy:
-a1 = 3i(i-1) + 2i + (i-1) = 3i2 – 1 dla a2 zwiększamy j o 2
-a2 = 3i(i+1) +2i + (i+1) = 3i2 + 6i + 1 stąd
-a2 – a1 = 6i + 2 
-Uzyskaliśmy kolejny kwadratowy liniowy ciąg arytmetyczny an = a1 + (n – 1)r dla n = 2, 4, 6, 8 …, gdzie r = 6n + 2
-{an}n=2∞= {3n2 - 1 : n = 2k ∈N}
-dla n=2: 11, 11+14=25, 25+11=36...
-dla n=4: 47+26=73, 73+26=99...
-Obliczamy wyraz dla i=2, aby od 0 wszystko pasowało:
-a1 = (i+2)2 – 1 = 3i2 + 12i + 11 oraz r = 6(i+2) +2 = 6i + 14
+even*even
+a1= 3i^2+14i+16;  r = a2-a1=6i+14
+odd*even
+a1= 3i^2+12i+11;  r = a2-a1=6i+10
+odd*odd
+a1= 3i^2+10i+8;  r = a2-a1=6i+10
+even*odd
+a1= 3i^2+12i+11;  r = a2-a1=6i+14
+These are four linear sequences determining all possible products of prime numbers. They indicate the indexes of these numbers in vector A
 
-Ad. 4  p  n
-W ostatnim pomijam już obliczenia. Są analogiczne do poprzednich
-a1 = 3i2 + 14i + 16 oraz r = 6i + 14
-Te cztery ciągi generują indeksy liczb postaci  6n±1, które nie są pierwsze. Oto kilka wygenerowanych ciągów. Liczby pogrubione wskazują numery liczb niebędących pierwszymi w wektorze do 100:
-8	18	28	38	48	58	68	78	88	98		nn
-40	62	84	106	128	150	172	194	216	238		
-96	130	164	198	232	266	300	334	368	402		
-176	222	268	314	360	406	452	498	544	590		
-280	338	396	454	512	570	628	686	744	802		
-408	478	548	618	688	758	828	898	968	1038		
-560	642	724	806	888	970	1052	1134	1216	1298		
-736	830	924	1018	1112	1206	1300	1394	1488	1582		
-936	1042	1148	1254	1360	1466	1572	1678	1784	1890		
-1160	1278	1396	1514	1632	1750	1868	1986	2104	2222		
-											
-11	21	31	41	51	61	71	81	91	101		np.
-47	69	91	113	135	157	179	201	223	245		
-107	141	175	209	243	277	311	345	379	413		
-191	237	283	329	375	421	467	513	559	605		
-299	357	415	473	531	589	647	705	763	821		
-431	501	571	641	711	781	851	921	991	1061		
-587	669	751	833	915	997	1079	1161	1243	1325		
-767	861	955	1049	1143	1237	1331	1425	1519	1613		
-971	1077	1183	1289	1395	1501	1607	1713	1819	1925		
-1199	1317	1435	1553	1671	1789	1907	2025	2143	2261		
-											
-11	25	39	53	67	81	95	109	123	137		Pn
-47	73	99	125	151	177	203	229	255	281		
-107	145	183	221	259	297	335	373	411	449		
-191	241	291	341	391	441	491	541	591	641		
-299	361	423	485	547	609	671	733	795	857		
-431	505	579	653	727	801	875	949	1023	1097		
-587	673	759	845	931	1017	1103	1189	1275	1361		
-767	865	963	1061	1159	1257	1355	1453	1551	1649		
-971	1081	1191	1301	1411	1521	1631	1741	1851	1961		
-1199	1321	1443	1565	1687	1809	1931	2053	2175	2297		
-											
-16	30	44	58	72	86	100	114	128	142		pp
-56	82	108	134	160	186	212	238	264	290		
-120	158	196	234	272	310	348	386	424	462		
-208	258	308	358	408	458	508	558	608	658		
-320	382	444	506	568	630	692	754	816	878		
-456	530	604	678	752	826	900	974	1048	1122		
-616	702	788	874	960	1046	1132	1218	1304	1390		
-800	898	996	1094	1192	1290	1388	1486	1584	1682		
-1008	1118	1228	1338	1448	1558	1668	1778	1888	1998		
-1240	1362	1484	1606	1728	1850	1972	2094	2216	2338	
+Based on this, I built an algorithm for determining prime numbers:
 
-The 6n ± 1 prime number generation algorithm:
-This algorithm generates prime numbers based on the pattern 6n ± 1 (i.e., numbers that are 1 less or 1 more than a multiple of 6). The algorithm eliminates non-prime numbers by checking numbers that can be expressed in this form.
-Steps:
-1. Initialize the Vector: Create a boolean vector (or an uint8_t type vector in this case) where each element corresponds to a number of the form 6n ± 1 (such numbers are 5, 7, 11, 13, 17, 19, 23, 25, etc.). Initially, every element is marked as true, assuming each number is potentially prime.
-2. Use Mathematical Patterns: Use four arithmetic progression patterns to eliminate non-primes. These patterns are based on the fact that numbers of the form 6n ± 1 form an arithmetic progression.
-nn (odd * odd): For example, for i = 1, j = 2, we calculate a1 = 3i² + 4i + 1.
-np (odd * even): For example, for i = 1, j = 2, we calculate a2 = 3i(i + 1) + i + 2(i + 1).
-pn (even * odd): For numbers resulting from the product of an even and an odd number.
-pp (even * even): For numbers resulting from the product of two even numbers.
-3. Eliminate Multiples of Primes: After calculating the indices for the prime numbers, eliminate the multiples of prime numbers. For each pattern (e.g., nn, np, pn, pp), mark the corresponding numbers as false (not prime).
-4. Count Primes: After marking the non-primes, traverse the vector and count the numbers that remain marked as true (i.e., prime numbers).
+Pseudocode
+FUNCTION generatePrimes(limit)
+    CREATE vector A of size (limit / 3 + 1), filled with TRUE  // Assume all numbers are prime
 
+    sqrt_limit ← FLOOR(sqrt(limit) / 3) + 1  // Compute upper bound for checking multiples
+
+    FOR i FROM 0 TO sqrt_limit STEP 2 DO
+        c ← 3 * i * i  // Common part for sequence formulas
+        a1 ← c + 10 * i + 8   // Formula nn
+        a2 ← c + 12 * i + 11  // Formula np
+        a3 ← c + 12 * i + 11  // Formula pn (for i+1)
+        a4 ← c + 14 * i + 16  // Formula pp (for i+1)
+        r ← 6 * i + 10        // Step difference
+
+        FOR a1 FROM a1 TO SIZE(A) STEP r DO
+            A[a1] ← FALSE  // Mark as composite
+
+            IF a2 < SIZE(A) THEN
+                A[a2] ← FALSE
+                a2 ← a2 + r
+            END IF
+
+            IF a3 < SIZE(A) THEN
+                A[a3] ← FALSE
+                a3 ← a3 + r + 4
+            END IF
+
+            IF a4 < SIZE(A) THEN
+                A[a4] ← FALSE
+                a4 ← a4 + r + 4
+            END IF
+        END FOR
+    END FOR
+
+    primeCount ← 2  // Include 2 and 3 as prime numbers
+
+    FOR i FROM 1 TO SIZE(A) - 1 DO
+        IF A[i] THEN
+            primeCount ← primeCount + 1
+        END IF
+    END FOR
+
+    PRINT "Number of prime numbers: ", primeCount
+END FUNCTION
+
+FUNCTION MAIN()
+    limit ← 10^10  // Range of numbers to check
+    PRINT "Range: ", limit
+
+    start ← CURRENT_TIME()  // Start time measurement
+    generatePrimes(limit)
+    end ← CURRENT_TIME()  // End time measurement
+
+    executionTime ← end - start
+    PRINT "Execution time (prime number generation algorithm): ", executionTime, " seconds"
+END FUNCTION
+
+RUN MAIN()
+In the tested range up to 10^10, the algorithm gives significantly better results than, for example, Atkin.
