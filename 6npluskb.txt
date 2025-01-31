@@ -13,8 +13,8 @@ a1 = e*e = (3(i+2)+1)*(3(i+2)+1)=3*(3i^2+14i+49/3)  dividing by 3        a1 = 3i
 a2 = (3(i+2)+1)*(3(i+4)+1)=3*(3i^2+20i+91/3) dividing by 3 a2 =  3i^2+20i+30 //integer division
 r = a2-a1=6i+14
 odd - odd/nn
-a1 = o*o = (3(i+1)+2)*(3(i+1)+2)=9i^2+30i+25=3(3i^2+10+25/3) dividing by 3 a1=3i^2+10i+8;
-a2 = (3(i+1)+2)*(3(i+3)+2)=3(3i^2+16i+55/3) dividing by 3 a2 = 3i^2+11i+18;
+a1 = o*o = (3(i+1)+2)*(3(i+1)+2)=9i^2+30i+25=3(3i^2+10+25/3) dividing by 3 a1=3i^2+10i+8;//integer division
+a2 = (3(i+1)+2)*(3(i+3)+2)=3(3i^2+16i+55/3) dividing by 3 a2 = 3i^2+11i+18;//integer division
 r = a2-a1 = 6i+10
 
 counting similarly for odd*odd, even*odd, odd*even, even*even we receive:
